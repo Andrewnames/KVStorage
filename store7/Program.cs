@@ -8,7 +8,7 @@ namespace KVstore
     {
         static void Main(string[] args)
         {
-            var storage = new Storage();
+            var storage = new DuplicableStorage();
             bool endApp = false;
 
             Console.WriteLine("Storage APP\r");
@@ -32,7 +32,7 @@ namespace KVstore
                             storage.Add(inputArgs[1], inputArgs[2]);
                             break;
                         case "remove":
-                            storage.Remove(inputArgs[1]);
+                            storage.Remove(inputArgs[1], inputArgs[2]);
                             break;
                         case "keys":
                             storage.Keys();
@@ -42,7 +42,7 @@ namespace KVstore
                             break;
 
                         case "removeAll":
-                            storage.Members(inputArgs[1]);
+                            storage.RemoveAll(inputArgs[1]);
                             break;
 
                         case "clear":
@@ -81,6 +81,7 @@ namespace KVstore
             }
 
         }
+        // if we only need unique keys in the storage
         class Storage
         {
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -166,5 +167,99 @@ namespace KVstore
                 }
             }
         }
+        // if we want to allow non unique keys in the storage
+        class DuplicableStorage
+        {
+            List<KeyValuePair<string, string>> dictionary = new List<KeyValuePair<string, string>>();
+
+            public void Add(string key, string value)
+            {
+                var newPair = new KeyValuePair<string, string>(key, value);
+                var checkup = dictionary.Contains(newPair);
+                if (!checkup)
+                {
+                    dictionary.Add(newPair);
+                }
+
+                Console.WriteLine(!checkup ? "Added" : "ERROR, member already exists for key");
+            }
+
+
+            public void Remove(string key, string value)
+            { 
+
+                var result = dictionary.Remove(dictionary.Where(kvp => kvp.Key == key && kvp.Value == value).FirstOrDefault());
+                Console.WriteLine(result ? "Removed" : "ERROR, member does not exist");
+            }
+
+            public void Keys()
+            {
+                foreach (KeyValuePair<string, string> kvp in dictionary)
+                {
+                    Console.WriteLine(kvp.Key);
+                }
+            }
+
+            public void Members(string key)
+            {
+                var kvps = dictionary.Where(kvp => kvp.Key == key).ToList();
+                if (kvps.Count == 0)
+                {
+                    Console.WriteLine("ERROR, key does not exist.");
+                    return;
+                }
+
+                foreach (var kvp in kvps)
+                {
+                    Console.WriteLine(kvp.Value);
+                }
+            }
+
+
+            public void RemoveAll(string key)
+            {
+                if (dictionary.Any(kvp => kvp.Key == key))
+                {
+                    dictionary.RemoveAll(kvp => kvp.Key == key);
+                }
+
+                else
+                {
+                    Console.WriteLine("ERROR, key does not exist.");
+                }
+            }
+
+            public void Clear()
+            {
+                dictionary.Clear();
+                Console.WriteLine("Storage Cleared");
+
+            }
+
+            public void KeyExist(string key)
+            {
+                var result = dictionary.Any(kvp => kvp.Key == key);
+                Console.WriteLine(result);
+            }
+
+            public void AllMembers()
+            {
+                foreach (KeyValuePair<string, string> kvp in dictionary)
+                {
+                    Console.WriteLine(kvp.Value);
+                }
+            }
+
+            public void Items()
+            {
+                foreach (KeyValuePair<string, string> kvp in dictionary)
+                {
+                    Console.WriteLine("{0} : {1}", kvp.Key, kvp.Value);
+                }
+            }
+        }
+
     }
+
+
 }
