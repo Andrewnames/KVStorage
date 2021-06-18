@@ -34,6 +34,9 @@ namespace KVstore
                         case "remove":
                             storage.Remove(inputArgs[1], inputArgs[2]);
                             break;
+                            case "intersection":
+                            storage.Intersection(inputArgs[1], inputArgs[2]);
+                            break;
                         case "keys":
                             storage.Keys();
                             break;
@@ -257,6 +260,25 @@ namespace KVstore
                     Console.WriteLine("{0} : {1}", kvp.Key, kvp.Value);
                 }
             }
+            
+            
+            public void Intersection(string key1, string key2) {
+
+                var listKey1 = dictionary.Where(kvp => kvp.Key == key1).ToList();
+                var listKey2 = dictionary.Where(kvp => kvp.Key == key2).ToList();
+                var intersection  = new List<string>();
+                foreach(var kvp in listKey1)
+                {
+                  listKey2.Where(kvp => kvp.Key == kvp.Key).ToList().ForEach(inclusion=> {
+                      intersection.Add(inclusion.Value);
+                  });
+                }
+
+                intersection.ForEach(value=> {
+                    Console.WriteLine(value);
+                });
+            }
+
         }
 
     }
